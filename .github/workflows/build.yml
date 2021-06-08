@@ -1,0 +1,24 @@
+name: "build"
+on:                                                                                                                                                                                                    
+  push:                                                                                                                                                                                                
+    branches:                                                                                                                                                                                          
+      - master 
+
+jobs:
+  build:
+    runs-on: "ubuntu-20.04"
+    steps:
+    - uses: "actions/checkout@v2"
+    - run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
+    - run: |
+        sudo apt-get update && sudo apt-get install -y binutils build-essential git flex bison libssl-dev bc libgmp-dev libmpc-dev
+    - run: "make nintendo3ds_defconfig"
+    - run: "make all"
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development build ${{ env.SHORT_SHA }}"
+        files: |
+          output/images/rootfs.cpio.gz

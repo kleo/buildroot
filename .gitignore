@@ -13,3 +13,5 @@
 *.rej
 *~
 *.pyc
+
+!.github
